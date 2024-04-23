@@ -86,28 +86,44 @@ def transform(extracted_data):
     
     # Create GBP Column
     extracted_data['MC_GBP_Billion'] = [ np.round(x * exchange_dictionary['GBP'], 2) for x in extracted_data['MC_USD_Billion']]
-    
     # Create EUR Column
     extracted_data['MC_EUR_Billion'] = [ np.round(x * exchange_dictionary['EUR'], 2) for x in extracted_data['MC_USD_Billion']]
-
     # Create INR Column
     extracted_data['MC_INR_Billion'] = [ np.round(x * exchange_dictionary['INR'], 2) for x in extracted_data['MC_USD_Billion']]
 
-
     return extracted_data
 
-    # Add columns with extra currencies to our main df
+def convert_to_csv(transformed_data, csv_path):
+    """
+    Converts and save the processed dataframe into a csv file
+    Returns nothing
+    """
+    transformed_data.to_csv(csv_path)
 
-
-
+def load_to_db(transformed_data, sql_connection, table_name):
+    """
+    Loads the processed dataframe into the target DB
+    Returns nothing
+    """
+    transformed_data.to_sql(table_name, sql_connection, if_exists='replace', index=False)
 
 # ACTUAL PIPELINE
 log_progress(LOG_FILE, 'PRELIMINARIES COMPLETED. INITIATING ETL PROCESS...')
 
 extracted_data = extract(URL, TABLE_ATTRIBUTES)
-print(f"DATAFRAME: \n{extracted_data}")
+# print(f"DATAFRAME: \n{extracted_data} \n")
 log_progress(LOG_FILE, 'DATA EXTRACTION COMPLETE. INITIATING TRANSFORMATION PROCESS...')
 
 transformed_data = transform(extracted_data)
-print(transformed_data)
+# print(transformed_data)
+# print(transformed_data['MC_EUR_Billion'][4])
 log_progress(LOG_FILE, 'DATA TRANSFORMATION COMPLETE. INITIATING LOADING PROCESS...')
+
+convert_to_csv(transformed_data, CSV_PATH)
+log_progress(LOG_FILE, 'CSV FILE SAVED. READY TO CONNECT TO DB...')
+
+SQL_CONNECTION = sqlite3.Connection(DB_NAME)
+log_progress(LOG_FILE, 'CONNECTION TO SQL DB ESTABLISHED. READY TO LOAD...')
+
+load_to_db(transformed_data, SQL_CONNECTION, TABLE_NAME)
+log_progress(LOG_FILE, 'DATAFRAME LOADED TO DB SUCCESFULLY. READY TO QUERY...')
