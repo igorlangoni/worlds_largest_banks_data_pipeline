@@ -29,9 +29,9 @@ def log_progress(log_file, message):
     timestamp = now.strftime(time_format)
 
     with open(log_file, 'a') as file:
-        file.write(timestamp + ', ' + message + '\n')
+        file.write(timestamp + " : " + message + '\n')
 
-def extract(url):
+def extract(url, table_attributes):
     """
     Extracts data from the given URL. Converts the text data into a pandas df.
     Returns a pandas DF
@@ -40,5 +40,34 @@ def extract(url):
     response = requests.get(url)
 
     # Parse response.text with HTML PARSER
-    soup = BeautifulSoup(response.text, 'hmtl.parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Create empty DF to receive data
+    df = pd.DataFrame(columns=table_attributes)
+
+    # Get the wanted table from soup object and its rows
+    table = soup.find('table').find_all('tr')
+
+    # Separate Header and Rows
+    table_header = table[0]
+    table_rows = table[1:]
+
     
+    for row in table_rows:
+        col = row.find_all('td')
+        
+        name = col[1].find_all('a')[1].contents[0]
+        mc = float(col[2].get_text()[:-1])
+
+        data_dict = {
+            'Name' : name,
+            'MC_USD_Billion' : mc,
+        }
+
+        df1 = pd.DataFrame(data_dict, index=[0])
+        df = pd.concat([df, df1], ignore_index=True)
+    
+    return df
+
+print(extract(URL, TABLE_ATTRIBUTES))
+
