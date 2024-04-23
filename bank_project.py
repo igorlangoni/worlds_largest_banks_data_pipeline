@@ -17,18 +17,28 @@ TABLE_ATTRIBUTES = [
 ]
 
 # SOURCE URL
-URL = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMSkillsNetwork-PY0221EN-Coursera/labs/v2/exchange_rate.csv'
+URL = 'https://web.archive.org/web/20230908091635/https://en.wikipedia.org/wiki/List_of_largest_banks'
 
 def log_progress(log_file, message):
     """
     Records timestamp and stage of process in a designed log file.
     Returns nothing
     """
-    time_format = '%Y-%h-%d-%H:%m:%s'
+    time_format = '%Y-%h-%d-%H:%M:%s'
     now = datetime.now()
     timestamp = now.strftime(time_format)
 
     with open(log_file, 'a') as file:
         file.write(timestamp + ', ' + message + '\n')
 
+def extract(url):
+    """
+    Extracts data from the given URL. Converts the text data into a pandas df.
+    Returns a pandas DF
+    """
+    # Gets response object from requests
+    response = requests.get(url)
 
+    # Parse response.text with HTML PARSER
+    soup = BeautifulSoup(response.text, 'hmtl.parser')
+    
