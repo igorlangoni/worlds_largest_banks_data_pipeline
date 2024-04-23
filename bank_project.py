@@ -107,6 +107,17 @@ def load_to_db(transformed_data, sql_connection, table_name):
     """
     transformed_data.to_sql(table_name, sql_connection, if_exists='replace', index=False)
 
+def run_query(query_statement, sql_connection):
+    """
+    Given a query and a connection and prints the output after querying the DB
+    Returns nothing
+    """
+    query_output = pd.read_sql(query_statement, sql_connection)
+    print(f"QUERY: {query_statement} \n")
+    print(f"{query_output}\n")
+
+
+
 # ACTUAL PIPELINE
 log_progress(LOG_FILE, 'PRELIMINARIES COMPLETED. INITIATING ETL PROCESS...')
 
@@ -127,3 +138,18 @@ log_progress(LOG_FILE, 'CONNECTION TO SQL DB ESTABLISHED. READY TO LOAD...')
 
 load_to_db(transformed_data, SQL_CONNECTION, TABLE_NAME)
 log_progress(LOG_FILE, 'DATAFRAME LOADED TO DB SUCCESFULLY. READY TO QUERY...')
+
+log_progress(LOG_FILE, '1st QUERY: \n')
+query_statement = f'SELECT * FROM {TABLE_NAME}'
+run_query(query_statement, SQL_CONNECTION)
+
+log_progress(LOG_FILE, '2nd QUERY: \n')
+query_statement = f"SELECT AVG(MC_GBP_Billion) as Average_Cap from {TABLE_NAME}"
+run_query(query_statement, SQL_CONNECTION)
+
+log_progress(LOG_FILE, '3rd QUERY: \n')
+query_statement = f"SELECT Name from {TABLE_NAME} LIMIT 5"
+run_query(query_statement, SQL_CONNECTION)
+
+log_progress(LOG_FILE, 'NO MORE QUERIES. PROCESS COMPLETE!')
+
