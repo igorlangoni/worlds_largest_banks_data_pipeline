@@ -116,8 +116,6 @@ def run_query(query_statement, sql_connection):
     print(f"QUERY: {query_statement} \n")
     print(f"{query_output}\n")
 
-
-
 # ACTUAL PIPELINE
 log_progress(LOG_FILE, 'PRELIMINARIES COMPLETED. INITIATING ETL PROCESS...')
 
@@ -139,17 +137,19 @@ log_progress(LOG_FILE, 'CONNECTION TO SQL DB ESTABLISHED. READY TO LOAD...')
 load_to_db(transformed_data, SQL_CONNECTION, TABLE_NAME)
 log_progress(LOG_FILE, 'DATAFRAME LOADED TO DB SUCCESFULLY. READY TO QUERY...')
 
-log_progress(LOG_FILE, '1st QUERY: \n')
+log_progress(LOG_FILE, 'Running 1st query')
 query_statement = f'SELECT * FROM {TABLE_NAME}'
 run_query(query_statement, SQL_CONNECTION)
 
-log_progress(LOG_FILE, '2nd QUERY: \n')
+log_progress(LOG_FILE, 'Running 2nd query')
 query_statement = f"SELECT AVG(MC_GBP_Billion) as Average_Cap from {TABLE_NAME}"
 run_query(query_statement, SQL_CONNECTION)
 
-log_progress(LOG_FILE, '3rd QUERY: \n')
+log_progress(LOG_FILE, 'Running 3rd query')
 query_statement = f"SELECT Name from {TABLE_NAME} LIMIT 5"
 run_query(query_statement, SQL_CONNECTION)
 
 log_progress(LOG_FILE, 'NO MORE QUERIES. PROCESS COMPLETE!')
 
+SQL_CONNECTION.close()
+log_progress(LOG_FILE, 'DB CONNECTION CLOSED.')
