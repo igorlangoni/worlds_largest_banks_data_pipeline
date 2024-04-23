@@ -76,13 +76,25 @@ def transform(extracted_data):
     """
     # Create Exchange Dictionary
     exchange_dictionary = {}
+
     # Creates PD from csv file and converts to dictionary usind pd.to_dict
     df = pd.read_csv('exchange_rate.csv').to_dict('split', index=False)
 
     # For each entry in df.data we take the key and value
     for currency in df['data']:
         exchange_dictionary[currency[0]] = currency[1]
+    
+    # Create GBP Column
+    extracted_data['MC_GBP_Billion'] = [ np.round(x * exchange_dictionary['GBP'], 2) for x in extracted_data['MC_USD_Billion']]
+    
+    # Create EUR Column
+    extracted_data['MC_EUR_Billion'] = [ np.round(x * exchange_dictionary['EUR'], 2) for x in extracted_data['MC_USD_Billion']]
 
+    # Create INR Column
+    extracted_data['MC_INR_Billion'] = [ np.round(x * exchange_dictionary['INR'], 2) for x in extracted_data['MC_USD_Billion']]
+
+
+    return extracted_data
 
     # Add columns with extra currencies to our main df
 
@@ -94,6 +106,8 @@ log_progress(LOG_FILE, 'PRELIMINARIES COMPLETED. INITIATING ETL PROCESS...')
 
 extracted_data = extract(URL, TABLE_ATTRIBUTES)
 print(f"DATAFRAME: \n{extracted_data}")
-log_progress(LOG_FILE, 'DATA EXTRACTION COMPLETE, INITIATING TRANSFORMATION PROCESS...')
+log_progress(LOG_FILE, 'DATA EXTRACTION COMPLETE. INITIATING TRANSFORMATION PROCESS...')
 
-print(transform(extracted_data))
+transformed_data = transform(extracted_data)
+print(transformed_data)
+log_progress(LOG_FILE, 'DATA TRANSFORMATION COMPLETE. INITIATING LOADING PROCESS...')
