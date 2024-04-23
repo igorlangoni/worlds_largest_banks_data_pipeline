@@ -51,7 +51,6 @@ def extract(url, table_attributes):
     # Separate Header and Rows
     table_header = table[0]
     table_rows = table[1:]
-
     
     for row in table_rows:
         col = row.find_all('td')
@@ -69,5 +68,9 @@ def extract(url, table_attributes):
     
     return df
 
-print(extract(URL, TABLE_ATTRIBUTES))
+# ACTUAL PIPELINE
+log_progress(LOG_FILE, 'PRELIMINARIES COMPLETED. INITIATING ETL PROCESS...')
 
+extracted_data = extract(URL, TABLE_ATTRIBUTES)
+print(f"DATAFRAME: \n{extracted_data}")
+log_progress(LOG_FILE, 'DATA EXTRACTION COMPLETE, INITIATING TRANSFORMATION PROCESS...')
